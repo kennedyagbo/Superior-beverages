@@ -1,0 +1,3 @@
+- **Animation & Interaction**: `framer-motion` for complex layout transitions and scroll reveals; `gsap` and `lenis` for high-performance smooth scrolling.
+- **UI Components**: `lucide-react` and `react-icons` for iconography; `embla-carousel-react` and `swiper` for product galleries.
+- **Form Handling**: `react-hook-form` with `zod` resolvers for type-safe form validation (e.g., distributor registration).

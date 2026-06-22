@@ -1,0 +1,5 @@
+- **Framework**: Built on Next.js 16 (App Router) using TypeScript for type safety and server-side rendering capabilities.
+- **Structure**: Follows a feature-based directory layout within `src/`, separating concerns into `app/` (routes/pages), `components/` (reusable UI and layout elements), `lib/` (data and utilities), `providers/` (context wrappers), and `types/` (shared interfaces).
+- **Pattern**: Implements a "Client/Server Split" pattern where `page.tsx` files handle metadata and server-side rendering, delegating interactive UI logic to corresponding `*Client.tsx` components marked with `'use client'`.
+- **Data Management**: Uses a centralized static data layer (`src/lib/data.ts`) for content management, decoupling business logic from the view layer.
+- **Styling**: Utilizes Tailwind CSS v4 with PostCSS for utility-first styling, enhanced by `clsx` and `tailwind-merge` for dynamic class composition.

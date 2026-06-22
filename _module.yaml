@@ -1,0 +1,82 @@
+schema_version: 1
+module_path: ""
+title: Superior Beverages Corporate Website
+scope:
+    - superior-beverages/.gitignore
+    - superior-beverages/AGENTS.md
+    - superior-beverages/CLAUDE.md
+    - superior-beverages/README.md
+    - superior-beverages/eslint.config.mjs
+    - superior-beverages/next-env.d.ts
+    - superior-beverages/next.config.ts
+    - superior-beverages/package-lock.json
+    - superior-beverages/package.json
+    - superior-beverages/postcss.config.mjs
+    - superior-beverages/tsconfig.json
+    - superior-beverages\.gitignore
+    - superior-beverages\AGENTS.md
+    - superior-beverages\CLAUDE.md
+    - superior-beverages\README.md
+    - superior-beverages\eslint.config.mjs
+    - superior-beverages\next-env.d.ts
+    - superior-beverages\next.config.ts
+    - superior-beverages\package-lock.json
+    - superior-beverages\package.json
+    - superior-beverages\postcss.config.mjs
+    - superior-beverages\public\file.svg
+    - superior-beverages\public\globe.svg
+    - superior-beverages\public\next.svg
+    - superior-beverages\public\vercel.svg
+    - superior-beverages\public\window.svg
+    - superior-beverages\src\app\about\AboutPageClient.tsx
+    - superior-beverages\src\app\about\page.tsx
+    - superior-beverages\src\app\blog\BlogPageClient.tsx
+    - superior-beverages\src\app\blog\[slug]\BlogPostClient.tsx
+    - superior-beverages\src\app\blog\[slug]\page.tsx
+    - superior-beverages\src\app\blog\page.tsx
+    - superior-beverages\src\app\careers\CareersPageClient.tsx
+    - superior-beverages\src\app\careers\page.tsx
+    - superior-beverages\src\app\contact\ContactPageClient.tsx
+    - superior-beverages\src\app\contact\page.tsx
+    - superior-beverages\src\app\distributor-registration\DistributorRegistrationClient.tsx
+    - superior-beverages\src\app\distributor-registration\page.tsx
+    - superior-beverages\src\app\faq\page.tsx
+    - superior-beverages\src\app\favicon.ico
+    - superior-beverages\src\app\gallery\GalleryPageClient.tsx
+    - superior-beverages\src\app\gallery\page.tsx
+    - superior-beverages\src\app\globals.css
+    - superior-beverages\src\app\layout.tsx
+    - superior-beverages\src\app\manufacturing\ManufacturingPageClient.tsx
+    - superior-beverages\src\app\manufacturing\page.tsx
+    - superior-beverages\src\app\not-found.tsx
+    - superior-beverages\src\app\page.tsx
+    - superior-beverages\src\app\privacy-policy\page.tsx
+    - superior-beverages\src\app\products\ProductsPageClient.tsx
+    - superior-beverages\src\app\products\[slug]\ProductDetailClient.tsx
+    - superior-beverages\src\app\products\[slug]\page.tsx
+    - superior-beverages\src\app\products\page.tsx
+    - superior-beverages\src\app\robots.ts
+    - superior-beverages\src\app\sitemap.ts
+    - superior-beverages\src\app\terms\page.tsx
+    - superior-beverages\src\app\wholesale\WholesalePageClient.tsx
+    - superior-beverages\src\app\wholesale\page.tsx
+    - superior-beverages\src\components\layout\Footer.tsx
+    - superior-beverages\src\components\layout\Navbar.tsx
+    - superior-beverages\src\components\ui\BackToTop.tsx
+    - superior-beverages\src\components\ui\CookieBanner.tsx
+    - superior-beverages\src\components\ui\CustomCursor.tsx
+    - superior-beverages\src\components\ui\ProductCard.tsx
+    - superior-beverages\src\components\ui\ScrollReveal.tsx
+    - superior-beverages\src\components\ui\SectionHeading.tsx
+    - superior-beverages\src\components\ui\StatsCounter.tsx
+    - superior-beverages\src\components\ui\WhatsAppButton.tsx
+    - superior-beverages\src\lib\data.ts
+    - superior-beverages\src\lib\utils.ts
+    - superior-beverages\src\providers\LoadingProvider.tsx
+    - superior-beverages\src\providers\SmoothScrollProvider.tsx
+    - superior-beverages\src\providers\ThemeProvider.tsx
+    - superior-beverages\src\types\index.ts
+    - superior-beverages\tsconfig.json
+source_files: []
+depends_on: []
+related_to: []

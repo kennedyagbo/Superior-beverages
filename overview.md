@@ -1,0 +1,1 @@
+A premium Next.js web application showcasing Superior Beverages' product portfolio, wholesale opportunities, and corporate identity with advanced UI interactions.

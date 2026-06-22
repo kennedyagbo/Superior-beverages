@@ -1,0 +1,3 @@
+- Route-level components are split into a server-side `page.tsx` for metadata/SEO and a `'use client'` named `*PageClient.tsx` for interactive UI logic.
+- Dynamic class names are constructed using a centralized `cn()` utility that combines `clsx` and `tailwind-merge` to handle conditional styling and conflict resolution.
+- Shared content and configuration objects (products, testimonials, navigation) are centralized in `src/lib/data.ts` rather than being hardcoded directly into page components.

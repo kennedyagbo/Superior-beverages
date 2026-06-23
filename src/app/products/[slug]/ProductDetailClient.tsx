@@ -4,132 +4,18 @@ import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { ChevronRight, Download, Package, Check, GlassWater, ShoppingCart, ShoppingBag, User, Mail, Phone, Hash, AlertCircle } from 'lucide-react';
+import { ChevronRight, Download, Package, Check, GlassWater, ShoppingCart } from 'lucide-react';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { ProductCard } from '@/components/ui/ProductCard';
 import { products } from '@/lib/data';
-import { saveOrder, generateOrderId } from '@/lib/orders';
 import type { Product } from '@/types';
 
 export default function ProductDetailClient({ product }: { product: Product }) {
-  const router = useRouter();
   const [activeImage, setActiveImage] = useState(0);
   const [inquirySent, setInquirySent] = useState(false);
   const relatedProducts = products.filter((p) => p.slug !== product.slug).slice(0, 3);
-  const orderFormRef = useRef<HTMLDivElement>(null);
-
-  // Order form state
-  const [orderForm, setOrderForm] = useState({ 
-    name: '', 
-    email: '', 
-    phone: '', 
-    quantity: 1, 
-    deliveryAddress: '',
-    paymentMethod: 'bank_transfer',
-    notes: ''
-  });
-  const [orderErrors, setOrderErrors] = useState<Record<string, string>>({});
-  const [orderLoading, setOrderLoading] = useState(false);
-  const [orderSuccess, setOrderSuccess] = useState(false);
-  const [orderError, setOrderError] = useState('');
-  const PRICE_PER_UNIT = 100;
-  const total = orderForm.quantity * PRICE_PER_UNIT;
-
-  function scrollToOrderForm() {
-    orderFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  function updateFormField(field: string, value: string) {
-    setOrderForm({ ...orderForm, [field]: value });
-    setOrderErrors({ ...orderErrors, [field]: '' });
-    // Dismiss success/error messages when user starts typing again
-    if (orderSuccess) setOrderSuccess(false);
-    if (orderError) setOrderError('');
-  }
-
-  function validateOrder() {
-    const errs: Record<string, string> = {};
-    if (!orderForm.name.trim()) errs.name = 'Full name is required';
-    if (!orderForm.email.trim() || !/^[^@]+@[^@]+\.[^@]+$/.test(orderForm.email)) errs.email = 'Valid email is required';
-    if (!orderForm.phone.trim()) errs.phone = 'Phone number is required';
-    if (orderForm.quantity < 1) errs.quantity = 'Quantity must be at least 1';
-    if (!orderForm.deliveryAddress.trim()) errs.deliveryAddress = 'Delivery address is required';
-    return errs;
-  }
-
-  async function handleOrderSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const errs = validateOrder();
-    if (Object.keys(errs).length > 0) { 
-      setOrderErrors(errs); 
-      setOrderError('');
-      return; 
-    }
-    
-    setOrderLoading(true);
-    setOrderError('');
-    
-    // Prepare form data for Formspree
-    const formData = {
-      name: orderForm.name,
-      email: orderForm.email,
-      phone: orderForm.phone,
-      product: product.name,
-      product_slug: product.slug,
-      quantity: orderForm.quantity,
-      unit_price: PRICE_PER_UNIT,
-      total_amount: total,
-      delivery_address: orderForm.deliveryAddress,
-      payment_method: orderForm.paymentMethod === 'bank_transfer' ? 'Bank Transfer' : 'Cash on Delivery',
-      notes: orderForm.notes || 'None',
-      order_date: new Date().toLocaleString('en-NG', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-    };
-    
-    try {
-      const response = await fetch('https://formspree.io/f/xzdlpwpz', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
-      
-      if (response.ok) {
-        // Success
-        setOrderSuccess(true);
-        setOrderForm({
-          name: '',
-          email: '',
-          phone: '',
-          quantity: 1,
-          deliveryAddress: '',
-          paymentMethod: 'bank_transfer',
-          notes: ''
-        });
-        
-        // Scroll to top of form to show success message
-        orderFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } else {
-        // Formspree returned an error
-        const result = await response.json();
-        setOrderError(result.error || 'Failed to submit order. Please try again.');
-      }
-    } catch (error) {
-      console.error('Formspree submission error:', error);
-      setOrderError('Network error. Please check your connection and try again.');
-    } finally {
-      setOrderLoading(false);
-    }
-  }
+  const inquiryFormRef = useRef<HTMLDivElement>(null);
 
   return (
     <>
@@ -231,13 +117,6 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                 {/* Actions */}
                 <div className="flex flex-col sm:flex-row gap-3">
                   <button
-                    onClick={scrollToOrderForm}
-                    className="btn-primary inline-flex items-center justify-center gap-2"
-                  >
-                    <ShoppingBag className="w-4 h-4" />
-                    Order Now
-                  </button>
-                  <button
                     onClick={() => { setInquirySent(true); setTimeout(() => setInquirySent(false), 3000); }}
                     className="btn-outline inline-flex items-center justify-center gap-2"
                   >
@@ -296,194 +175,19 @@ export default function ProductDetailClient({ product }: { product: Product }) {
         </div>
       </section>
 
-      {/* ===== ORDER FORM ===== */}
-      <section ref={orderFormRef} className="py-20" style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #722F37 100%)' }}>
+      {/* ===== ORDER FORM - TEMPORARILY DISABLED ===== */}
+      <section className="py-20" style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #722F37 100%)' }}>
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <div className="text-center mb-10">
-              <span className="text-xs tracking-[0.3em] uppercase font-semibold" style={{ color: '#C9A84C' }}>Place Your Order</span>
-              <h2 className="text-3xl md:text-4xl font-serif font-bold text-white mt-3">Order {product.name}</h2>
-              <p className="text-white/70 mt-3">Fill in your details below and submit your order. Price: <span className="text-yellow-300 font-bold">₦100 per unit</span></p>
+            <div className="text-center">
+              <span className="text-xs tracking-[0.3em] uppercase font-semibold" style={{ color: '#C9A84C' }}>Order System</span>
+              <h2 className="text-3xl md:text-4xl font-serif font-bold text-white mt-3">Coming Soon</h2>
+              <p className="text-white/70 mt-4 text-lg">We're working on our online ordering system. Please contact us directly to place orders.</p>
+              <div className="mt-8 inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-white/10 border border-white/20">
+                <span className="text-white/60 text-sm">Contact us at:</span>
+                <a href="mailto:info@superiorbeverages.com" className="text-yellow-400 font-semibold hover:underline">info@superiorbeverages.com</a>
+              </div>
             </div>
-
-            {/* Success Message */}
-            {orderSuccess && (
-              <motion.div 
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mb-6 p-5 rounded-xl border border-green-400/30" 
-                style={{ background: 'rgba(34, 197, 94, 0.15)' }}
-              >
-                <div className="flex items-start gap-3">
-                  <Check className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <h3 className="text-white font-bold text-lg mb-1">Order Submitted Successfully!</h3>
-                    <p className="text-white/80 text-sm leading-relaxed">
-                      Thank you for your order! We have received your details and will contact you shortly to confirm payment and delivery. Please check your email for a confirmation message.
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Error Message */}
-            {orderError && (
-              <motion.div 
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mb-6 p-5 rounded-xl border border-red-400/30" 
-                style={{ background: 'rgba(239, 68, 68, 0.15)' }}
-              >
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="w-6 h-6 text-red-400 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <h3 className="text-white font-bold text-lg mb-1">Submission Failed</h3>
-                    <p className="text-white/80 text-sm leading-relaxed">{orderError}</p>
-                    <button 
-                      onClick={() => setOrderError('')}
-                      className="mt-3 text-sm text-white underline hover:no-underline"
-                    >
-                      Dismiss and try again
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            <form onSubmit={handleOrderSubmit} className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 space-y-5">
-              {/* Full Name */}
-              <div>
-                <label className="block text-sm font-semibold text-white/80 mb-1.5">Full Name *</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                  <input
-                    type="text"
-                    value={orderForm.name}
-                    onChange={(e) => updateFormField('name', e.target.value)}
-                    placeholder="e.g. Chidi Okonkwo"
-                    className="w-full pl-10 pr-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/30 focus:outline-none focus:border-yellow-400 transition"
-                  />
-                </div>
-                {orderErrors.name && <p className="text-red-300 text-xs mt-1">{orderErrors.name}</p>}
-              </div>
-
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-semibold text-white/80 mb-1.5">Email Address *</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                  <input
-                    type="email"
-                    value={orderForm.email}
-                    onChange={(e) => updateFormField('email', e.target.value)}
-                    placeholder="e.g. chidi@email.com"
-                    className="w-full pl-10 pr-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/30 focus:outline-none focus:border-yellow-400 transition"
-                  />
-                </div>
-                {orderErrors.email && <p className="text-red-300 text-xs mt-1">{orderErrors.email}</p>}
-              </div>
-
-              {/* Phone */}
-              <div>
-                <label className="block text-sm font-semibold text-white/80 mb-1.5">Phone Number *</label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                  <input
-                    type="tel"
-                    value={orderForm.phone}
-                    onChange={(e) => updateFormField('phone', e.target.value)}
-                    placeholder="e.g. 08012345678"
-                    className="w-full pl-10 pr-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/30 focus:outline-none focus:border-yellow-400 transition"
-                  />
-                </div>
-                {orderErrors.phone && <p className="text-red-300 text-xs mt-1">{orderErrors.phone}</p>}
-              </div>
-
-              {/* Delivery Address */}
-              <div>
-                <label className="block text-sm font-semibold text-white/80 mb-1.5">Delivery Address *</label>
-                <textarea
-                  value={orderForm.deliveryAddress}
-                  onChange={(e) => updateFormField('deliveryAddress', e.target.value)}
-                  placeholder="Enter your full delivery address"
-                  rows={3}
-                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/30 focus:outline-none focus:border-yellow-400 transition resize-none"
-                />
-                {orderErrors.deliveryAddress && <p className="text-red-300 text-xs mt-1">{orderErrors.deliveryAddress}</p>}
-              </div>
-
-              {/* Payment Method */}
-              <div>
-                <label className="block text-sm font-semibold text-white/80 mb-1.5">Payment Method *</label>
-                <select
-                  value={orderForm.paymentMethod}
-                  onChange={(e) => updateFormField('paymentMethod', e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-yellow-400 transition cursor-pointer"
-                >
-                  <option value="bank_transfer" className="bg-gray-900 text-white">Bank Transfer</option>
-                  <option value="cash_on_delivery" className="bg-gray-900 text-white">Cash on Delivery</option>
-                </select>
-                <p className="text-white/50 text-xs mt-1.5">
-                  {orderForm.paymentMethod === 'bank_transfer' 
-                    ? 'You will receive bank account details after order submission'
-                    : 'Pay when your order is delivered'}
-                </p>
-              </div>
-
-              {/* Additional Notes */}
-              <div>
-                <label className="block text-sm font-semibold text-white/80 mb-1.5">Additional Notes (Optional)</label>
-                <textarea
-                  value={orderForm.notes}
-                  onChange={(e) => updateFormField('notes', e.target.value)}
-                  placeholder="Any special instructions or notes about your order"
-                  rows={2}
-                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/30 focus:outline-none focus:border-yellow-400 transition resize-none"
-                />
-              </div>
-
-              {/* Quantity */}
-              <div>
-                <label className="block text-sm font-semibold text-white/80 mb-1.5">Quantity *</label>
-                <div className="relative">
-                  <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                  <input
-                    type="number"
-                    min={1}
-                    value={orderForm.quantity}
-                    onChange={(e) => updateFormField('quantity', String(Math.max(1, parseInt(e.target.value) || 1)))}
-                    className="w-full pl-10 pr-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-yellow-400 transition"
-                  />
-                </div>
-                {orderErrors.quantity && <p className="text-red-300 text-xs mt-1">{orderErrors.quantity}</p>}
-              </div>
-
-              {/* Order Summary */}
-              <div className="rounded-xl bg-white/5 border border-white/10 p-5">
-                <div className="flex justify-between text-sm text-white/70 mb-2">
-                  <span>Unit Price</span><span>₦100.00</span>
-                </div>
-                <div className="flex justify-between text-sm text-white/70 mb-3">
-                  <span>Quantity</span><span>{orderForm.quantity}</span>
-                </div>
-                <div className="border-t border-white/20 pt-3 flex justify-between font-bold text-white text-lg">
-                  <span>Total</span><span style={{ color: '#C9A84C' }}>₦{total.toLocaleString()}.00</span>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={orderLoading}
-                className="w-full py-4 rounded-xl font-bold text-white text-base transition-all disabled:opacity-60 flex items-center justify-center gap-2 min-h-[44px]"
-                style={{ background: 'linear-gradient(135deg, #C9A84C, #a07d2e)' }}
-              >
-                {orderLoading ? (
-                  <><span className="animate-spin rounded-full w-4 h-4 border-2 border-white border-t-transparent" />Submitting Order...</>
-                ) : (
-                  <><ShoppingBag className="w-5 h-5" />Place Order</>
-                )}
-              </button>
-            </form>
           </motion.div>
         </div>
       </section>

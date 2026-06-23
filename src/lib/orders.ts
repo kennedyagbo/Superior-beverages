@@ -1,67 +1,32 @@
-import { supabase } from './supabase';
 import type { Order, OrderStatus } from '@/types';
 
+const ORDERS_KEY = 'sb_orders';
 const CODES_KEY = 'sb_admin_codes';
 const AUTH_KEY = 'sb_admin_auth';
 const ADMIN_PASSWORD = 'SB@Admin2024';
 
 /* ── Orders ──────────────────────────────────────────── */
 
-export async function getOrders(): Promise<Order[]> {
+export function getOrders(): Order[] {
+  if (typeof window === 'undefined') return [];
   try {
-    const { data, error } = await supabase
-      .from('orders')
-      .select('*')
-      .order('created_at', { ascending: false });
-    
-    if (error) {
-      console.error('Error fetching orders:', error);
-      return [];
-    }
-    return (data || []) as Order[];
-  } catch (error) {
-    console.error('Error fetching orders:', error);
+    return JSON.parse(localStorage.getItem(ORDERS_KEY) || '[]') as Order[];
+  } catch {
     return [];
   }
 }
 
-export async function saveOrder(order: Order): Promise<boolean> {
+export function saveOrder(order: Order): boolean {
   try {
-    // Prevent duplicate orders
-    const { data: existing } = await supabase
-      .from('orders')
-      .select('id')
-      .eq('id', order.id)
-      .single();
-    
-    if (existing) {
+    const orders = getOrders();
+    // Check for duplicates
+    const exists = orders.find(o => o.id === order.id);
+    if (exists) {
       console.warn('Duplicate order detected:', order.id);
       return false;
     }
-    
-    const { error } = await supabase
-      .from('orders')
-      .insert({
-        id: order.id,
-        product_slug: order.productSlug,
-        product_name: order.productName,
-        quantity: order.quantity,
-        total_price: order.totalPrice,
-        customer_name: order.customerName,
-        customer_email: order.customerEmail,
-        customer_phone: order.customerPhone,
-        delivery_address: order.deliveryAddress || null,
-        payment_method: order.paymentMethod || 'bank_transfer',
-        payment_status: order.paymentStatus || 'pending',
-        transaction_id: order.transactionId || null,
-        status: order.status,
-        created_at: order.createdAt,
-      });
-    
-    if (error) {
-      console.error('Error saving order:', error);
-      return false;
-    }
+    orders.unshift(order); // newest first
+    localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
     return true;
   } catch (error) {
     console.error('Error saving order:', error);
@@ -69,38 +34,28 @@ export async function saveOrder(order: Order): Promise<boolean> {
   }
 }
 
-export async function updateOrderStatus(id: string, status: OrderStatus): Promise<boolean> {
+export function updateOrderStatus(id: string, status: OrderStatus): boolean {
   try {
-    const { error } = await supabase
-      .from('orders')
-      .update({ 
-        status,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', id);
-    
-    if (error) {
-      console.error('Error updating order status:', error);
-      return false;
+    const orders = getOrders();
+    const idx = orders.findIndex((o) => o.id === id);
+    if (idx !== -1) {
+      orders[idx].status = status;
+      orders[idx].updatedAt = new Date().toISOString();
+      localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+      return true;
     }
-    return true;
+    return false;
   } catch (error) {
     console.error('Error updating order status:', error);
     return false;
   }
 }
 
-export async function deleteOrder(id: string): Promise<boolean> {
+export function deleteOrder(id: string): boolean {
   try {
-    const { error } = await supabase
-      .from('orders')
-      .delete()
-      .eq('id', id);
-    
-    if (error) {
-      console.error('Error deleting order:', error);
-      return false;
-    }
+    const orders = getOrders();
+    const filtered = orders.filter(o => o.id !== id);
+    localStorage.setItem(ORDERS_KEY, JSON.stringify(filtered));
     return true;
   } catch (error) {
     console.error('Error deleting order:', error);
@@ -108,18 +63,10 @@ export async function deleteOrder(id: string): Promise<boolean> {
   }
 }
 
-export async function getOrderById(id: string): Promise<Order | null> {
+export function getOrderById(id: string): Order | null {
   try {
-    const { data, error } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('id', id)
-      .single();
-    
-    if (error || !data) {
-      return null;
-    }
-    return data as Order;
+    const orders = getOrders();
+    return orders.find(o => o.id === id) || null;
   } catch (error) {
     console.error('Error fetching order:', error);
     return null;
@@ -155,61 +102,25 @@ export function isAdminAuthenticated(): boolean {
 
 /* ── Access Codes ────────────────────────────────────── */
 
-export async function getAdminCodes(): Promise<string[]> {
+export function getAdminCodes(): string[] {
+  if (typeof window === 'undefined') return [];
   try {
-    const { data, error } = await supabase
-      .from('admin_codes')
-      .select('code')
-      .order('created_at', { ascending: false });
-    
-    if (error) {
-      console.error('Error fetching admin codes:', error);
-      return [];
-    }
-    return (data || []).map(row => row.code);
-  } catch (error) {
-    console.error('Error fetching admin codes:', error);
+    return JSON.parse(localStorage.getItem(CODES_KEY) || '[]') as string[];
+  } catch {
     return [];
   }
 }
 
-export async function saveAdminCode(code: string): Promise<boolean> {
-  try {
-    const codes = await getAdminCodes();
-    if (codes.includes(code)) {
-      return false; // Already exists
-    }
-    
-    const { error } = await supabase
-      .from('admin_codes')
-      .insert({ code });
-    
-    if (error) {
-      console.error('Error saving admin code:', error);
-      return false;
-    }
-    return true;
-  } catch (error) {
-    console.error('Error saving admin code:', error);
-    return false;
+export function saveAdminCode(code: string): void {
+  const codes = getAdminCodes();
+  if (!codes.includes(code)) {
+    codes.push(code);
+    localStorage.setItem(CODES_KEY, JSON.stringify(codes));
   }
 }
 
-export async function deleteAdminCode(code: string): Promise<boolean> {
-  try {
-    const { error } = await supabase
-      .from('admin_codes')
-      .delete()
-      .eq('code', code);
-    
-    if (error) {
-      console.error('Error deleting admin code:', error);
-      return false;
-    }
-    return true;
-  } catch (error) {
-    console.error('Error deleting admin code:', error);
-    return false;
-  }
+export function deleteAdminCode(code: string): void {
+  const codes = getAdminCodes().filter((c) => c !== code);
+  localStorage.setItem(CODES_KEY, JSON.stringify(codes));
 }
 

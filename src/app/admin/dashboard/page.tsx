@@ -11,7 +11,6 @@ import {
   getOrders, updateOrderStatus, deleteOrder, isAdminAuthenticated, clearAdminAuth,
   getAdminCodes, saveAdminCode, deleteAdminCode
 } from '@/lib/orders';
-import { supabase } from '@/lib/supabase';
 import type { Order, OrderStatus } from '@/types';
 
 const STATUS_CONFIG: Record<OrderStatus, { label: string; color: string; bg: string; icon: React.ElementType }> = {
@@ -36,10 +35,10 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<'orders' | 'codes'>('orders');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-const loadData = useCallback(async () => {
-  const ordersData = await getOrders();
+const loadData = useCallback(() => {
+  const ordersData = getOrders();
   setOrders(ordersData);
-  const codesData = await getAdminCodes();
+  const codesData = getAdminCodes();
   setCodes(codesData);
 }, []);
 
@@ -49,21 +48,6 @@ const loadData = useCallback(async () => {
       return;
     }
     loadData();
-    
-    // Subscribe to real-time order updates
-    const channel = supabase
-      .channel('orders-channel')
-      .on('postgres_changes', 
-        { event: 'INSERT', schema: 'public', table: 'orders' },
-        (payload) => {
-          setOrders(prev => [payload.new as Order, ...prev]);
-        }
-      )
-      .subscribe();
-    
-    return () => { 
-      supabase.removeChannel(channel); 
-    };
   }, [router, loadData]);
 
   function handleLogout() {
@@ -71,18 +55,18 @@ const loadData = useCallback(async () => {
     router.replace('/admin');
   }
 
-  async function handleStatusChange(orderId: string, newStatus: OrderStatus) {
+  function handleStatusChange(orderId: string, newStatus: OrderStatus) {
     setUpdatingId(orderId);
-    const success = await updateOrderStatus(orderId, newStatus);
+    const success = updateOrderStatus(orderId, newStatus);
     if (success) {
       loadData();
     }
     setUpdatingId(null);
   }
 
-  async function handleDeleteOrder(orderId: string) {
+  function handleDeleteOrder(orderId: string) {
     if (!confirm('Are you sure you want to delete this order? This action cannot be undone.')) return;
-    const success = await deleteOrder(orderId);
+    const success = deleteOrder(orderId);
     if (success) {
       loadData();
     }
@@ -111,15 +95,15 @@ const loadData = useCallback(async () => {
     if (!code) { setCodeError('Please enter a code'); return; }
     if (code.length < 4) { setCodeError('Code must be at least 4 characters'); return; }
     if (codes.includes(code)) { setCodeError('This code already exists'); return; }
-    saveAdminCode(code).then(() => {
-      setNewCode('');
-      setCodeError('');
-      loadData();
-    });
+    saveAdminCode(code);
+    setNewCode('');
+    setCodeError('');
+    loadData();
   }
 
   function handleDeleteCode(code: string) {
-    deleteAdminCode(code).then(() => loadData());
+    deleteAdminCode(code);
+    loadData();
   }
 
   function copyCode(code: string) {

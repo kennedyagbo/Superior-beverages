@@ -1,7 +1,5 @@
-import type { Order, OrderStatus } from '@/types';
 
 const ORDERS_KEY = 'sb_orders';
-const CODES_KEY = 'sb_admin_codes';
 const AUTH_KEY = 'sb_admin_auth';
 const ADMIN_PASSWORD = 'SB@Admin2024';
 

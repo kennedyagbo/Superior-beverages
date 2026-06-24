@@ -22,25 +22,25 @@
 
   /* Neutrals */
   --white: #FFFFFF;
-  --off-white: #FAFAF8;
-  --cream: #F5F0E8;
-  --soft-gray: #E8E4DE;
-  --medium-gray: #9A9590;
-  --dark-gray: #4A4540;
-  --charcoal: #2A2520;
+  --off-white: #0d1129;
+  --cream: #111533;
+  --soft-gray: #1a1f3a;
+  --medium-gray: #8888a0;
+  --dark-gray: #c0c0d0;
+  --charcoal: #f0f0f5;
 
   /* Glass Effects */
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.3);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 
   /* Backgrounds */
-  --background: #FAFAF8;
-  --foreground: #2A2520;
-  --card-bg: rgba(255, 255, 255, 0.8);
-  --card-border: rgba(0, 0, 0, 0.06);
-  --muted: #E8E4DE;
-  --muted-foreground: #9A9590;
+  --background: #0a0e27;
+  --foreground: #f0f0f5;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --muted: #1a1f3a;
+  --muted-foreground: #8888a0;
 
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, #722F37 0%, #9B2335 50%, #722F37 100%);
